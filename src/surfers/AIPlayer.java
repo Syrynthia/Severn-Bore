@@ -11,6 +11,8 @@ public class AIPlayer implements Player {
 	private final int MAX_MOVE = 3;
 	private List<Integer> shifts;
 	private int dir = 8;
+    protected int index1 = 0;
+	protected int index2 = 1;
 
 	public AIPlayer() {
 		side = Game.PLAYER1;
@@ -20,6 +22,10 @@ public class AIPlayer implements Player {
 	public AIPlayer(int side) {
 		this.side = side;
 		makeShifts();
+		if (side < 0) {
+			index1 = 2;
+			index2 = 3;
+		}
 	}
 
 	// function for creating a list of directional shifts from the xy position
@@ -147,22 +153,16 @@ public class AIPlayer implements Player {
 		// side is either 1 or -1 so this will return the value for the current player
 		return side * (val0 + val1 - (val2 + val3));
 	}
-	
+
 	public void makeMove(Board board) {
 		long[][] moves = getPossibleMoves(board.getPositions(), board.getSurfers(), this.side);
 		int size = possibleMoveCount(moves);
-		if(size <= 0 ) {
+		if (size <= 0) {
 			System.out.println("I have no more moves");
 			return;
 		}
 		Random rnd = new Random();
 		int nr = rnd.nextInt(size);
-		int index1 = 0;
-		int index2 = 1;
-		if (this.side < 0) {
-			index1 = 2;
-			index2 = 3;
-		}
 		int index = -1;
 		int counter = 0;
 		for (int i = 0; i < moves.length; i++) {
@@ -180,6 +180,10 @@ public class AIPlayer implements Player {
 			}
 		}
 
+	}
+
+	public int getSide() {
+		return side;
 	}
 
 }
