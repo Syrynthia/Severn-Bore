@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class AIPlayer implements Player{
+public class AIPlayer implements Player {
 	private int side;
 	protected int row = Board.ROW;
 	protected int col = Board.COL;
@@ -51,12 +51,12 @@ public class AIPlayer implements Player{
 		long[][] moves1 = possibleMoves(boardPos, surfPos[index1]);
 		long[][] moves2 = possibleMoves(boardPos, surfPos[index2]);
 		for (int i = 0; i < moves.length; i++) {
-			if(i < row*col)
+			if (i < row * col)
 				moves[i] = moves1[i];
 			else
-				moves[i] = moves2[i%(row*col)];
+				moves[i] = moves2[i % (row * col)];
 		}
-			return moves;
+		return moves;
 	}
 
 	// checking possible moves for the surfer at x, y
@@ -133,7 +133,7 @@ public class AIPlayer implements Player{
 		for (int i = 0; i < moves.length; i++) {
 			if (moves[i] != null) {
 				count += moves[i].length;
-				//System.out.println(i + ": " + moves[i].length);
+				// System.out.println(i + ": " + moves[i].length);
 			}
 		}
 		return count;
@@ -147,10 +147,9 @@ public class AIPlayer implements Player{
 		// side is either 1 or -1 so this will return the value for the current player
 		return side * (val0 + val1 - (val2 + val3));
 	}
-
-	@Override
-	public int[] getMove(long boardPos, int[] surfPos) {
-		long[][] moves = getPossibleMoves(boardPos, surfPos, this.side);
+	
+	public void makeMove(Board board) {
+		long[][] moves = getPossibleMoves(board.getPositions(), board.getSurfers(), this.side);
 		int size = possibleMoveCount(moves);
 		Random rnd = new Random();
 		int nr = rnd.nextInt(size);
@@ -160,21 +159,23 @@ public class AIPlayer implements Player{
 			index1 = 2;
 			index2 = 3;
 		}
-		int[] result = new int[3];
+		int index = -1;
 		int counter = 0;
 		for (int i = 0; i < moves.length; i++) {
 			if (moves[i] != null) {
 				for (int j = 0; j < moves[i].length; j++) {
-					if(counter == nr) {
-						if(i < row*col) result[0] = index1;
-						else result[0] = index2;
-						result[1] = i%(row*col);
+					if (counter == nr) {
+						if (i < row * col)
+							index = index1;
+						else
+							index = index2;
+						board.putAi(index, i % (row * col), moves[i][j]);
 					}
 					counter++;
 				}
 			}
 		}
-		return null;
+
 	}
 
 }

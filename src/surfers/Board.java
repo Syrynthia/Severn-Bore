@@ -25,6 +25,12 @@ public class Board {
 		surfers[surferIndex] = position;
 		positions = positions | 1L << (position);
 	}
+	
+	public void putAi(int sIndex, int sPosition, long board) {
+		surfers[sIndex] = sPosition;
+		positions = board;
+		currentPlayer = -currentPlayer;
+	}
 
 	private void removeSurfer(int surferIndex) {
 		positions = positions ^ 1L << (surfers[surferIndex]);
@@ -178,5 +184,13 @@ public class Board {
 	}
 	public int[] getSurfers() {
 		return surfers;
+	}
+	public int[] getSurfers(int side) {
+		if(side >= 0)
+			return new int[]{surfers[0], surfers[1]};
+		return new int[]{surfers[2], surfers[3]};
+	}
+	public int getCurrentPlayer() {
+		return currentPlayer;
 	}
 }

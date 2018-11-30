@@ -3,12 +3,16 @@ package surfers;
 import java.util.Scanner;
 
 public class HumanPlayer implements Player {
+	private int side;
+
+	public HumanPlayer(int side) {
+		this.side = side;
+	}
+
 	final public static String[] LETTERS = Board.LETTERS;
 	final static public String[] letters = { "a", "b", "c", "d", "e", "f", "g" };
 
-	@Override
-	public int[] getMove(long boardPos, int[] surfPos) {
-
+	public void makeMove(Board board) {
 		boolean inputting = true;
 		int[] positions = new int[3];
 		while (inputting) {
@@ -17,10 +21,15 @@ public class HumanPlayer implements Player {
 			Scanner scan = new Scanner(System.in);
 			positions = inputParser(scan.nextLine());
 			if (positions != null && positions.length == 3) {
-
+				int x = positions[1] / Board.ROW;
+				int y = positions[1] % Board.ROW;
+				int chargeX = positions[2] / Board.ROW;
+				int chargeY = positions[2] % Board.ROW;
+				int surferIndex = positions[0] == board.getSurfers(side)[0] ? 
+						(side >= 0 ? 0 : 2) : (side >= 0 ? 1 : 3);
+				if (board.movePlayer(surferIndex, x, y, chargeX, chargeY)) inputting = false;
 			}
 		}
-		return positions;
 	}
 
 	public int[] inputParser(String input) {
