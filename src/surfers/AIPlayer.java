@@ -151,6 +151,10 @@ public class AIPlayer implements Player {
 	public void makeMove(Board board) {
 		long[][] moves = getPossibleMoves(board.getPositions(), board.getSurfers(), this.side);
 		int size = possibleMoveCount(moves);
+		if(size <= 0 ) {
+			System.out.println("I have no more moves");
+			return;
+		}
 		Random rnd = new Random();
 		int nr = rnd.nextInt(size);
 		int index1 = 0;

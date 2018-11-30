@@ -74,6 +74,32 @@ public class Game {
 	}
 
 	private boolean gameEnded() {
+		long[] masks = new long[4];
+		int[] surfers = board.getSurfers();
+		for (int i = -1; i < 2; i++) {
+			for (int j = -1; j < 2; j++) {
+				for (int k = 0; k < 4; k++) {
+					int r = surfers[k] / Board.ROW;
+					int c = surfers[k] % Board.COL;
+					if (r + i >= 0 && r + i < Board.ROW && c + j >= 0 && c + j < Board.COL)
+						masks[k] = masks[k] | 1L << ((r + i) * Board.ROW) + c + j;
+				}
+			}
+		}
+		boolean p1 = (masks[0] & board.getPositions()) == masks[0] && (masks[1] & board.getPositions()) == masks[1];
+		boolean p2 = (masks[2] & board.getPositions()) == masks[2] && (masks[3] & board.getPositions()) == masks[3];
+		if (p1 && p2) {
+			System.out.println("It's a draw!");
+			return true;
+		}
+		else if (p1) {
+			System.out.println("Congratulations! Player 2 has won!");
+			return true;
+		}
+		else if (p2) {
+			System.out.println("Congratulations! Player 1 has won!");
+			return true;
+		}
 		return false;
 	}
 

@@ -17,7 +17,7 @@ public class HumanPlayer implements Player {
 		int[] positions = new int[3];
 		while (inputting) {
 			System.out.println("Please put in the location of the surfer you want to move, "
-					+ "it's new position and where you want to put your charge");
+					+ "its new position and where you want to put your charge");
 			Scanner scan = new Scanner(System.in);
 			positions = inputParser(scan.nextLine());
 			if (positions != null && positions.length == 3) {
