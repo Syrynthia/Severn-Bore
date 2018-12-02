@@ -11,7 +11,7 @@ public class AIPlayer implements Player {
 	private final int MAX_MOVE = 3;
 	private List<Integer> shifts;
 	private int dir = 8;
-    protected int index1 = 0;
+	protected int index1 = 0;
 	protected int index2 = 1;
 
 	public AIPlayer() {
@@ -145,13 +145,45 @@ public class AIPlayer implements Player {
 		return count;
 	}
 
+	// the evaluation function is focused on simply maximising the amount of full fields around the opponent
+	// and minimising the amount of filled fields around the player
+	// I've introduced a penalty and reward system which seems to prod it in the right direction
 	public int evaluate(long position, int[] surfers, int side) {
-		int val0 = possibleMoveCount(possibleMoves(position, surfers[0]));
-		int val1 = possibleMoveCount(possibleMoves(position, surfers[1]));
-		int val2 = possibleMoveCount(possibleMoves(position, surfers[2]));
-		int val3 = possibleMoveCount(possibleMoves(position, surfers[3]));
-		// side is either 1 or -1 so this will return the value for the current player
-		return side * (val0 + val1 - (val2 + val3));
+		int result = 0;
+		int reward = 50;
+		int penalty = -100;
+		for (int i = -1; i < 2; i++) {
+			for (int j = -1; j < 2; j++) {
+				for (int k = 0; k < 2; k++) {
+					int r = surfers[k] / Board.ROW;
+					int c = surfers[k] % Board.COL;
+					if (r + i >= 0 && r + i < Board.ROW && c + j >= 0 && c + j < Board.COL) {
+						if ((position & 1L << ((r + i) * Board.ROW) + c + j) != 0) {
+							if(side >= 0) result += penalty;
+							else result += reward;
+						}
+					} else {
+						if(side >= 0) result += penalty;
+						else result += reward;
+					}
+				}
+				for (int k = 2; k < 4; k++) {
+					int r = surfers[k] / Board.ROW;
+					int c = surfers[k] % Board.COL;
+					if (r + i >= 0 && r + i < Board.ROW && c + j >= 0 && c + j < Board.COL) {
+						if ((position & 1L << ((r + i) * Board.ROW) + c + j) != 0){
+							if(side < 0) result += penalty;
+							else result += reward;
+						}
+					} else {
+						if(side < 0) result += penalty;
+						else result += reward;
+					}
+				}
+			}
+		}
+
+		return result; // side * (counters[2] + counters[3] - counters[0] - counters[1]);
 	}
 
 	public void makeMove(Board board) {

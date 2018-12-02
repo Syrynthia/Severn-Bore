@@ -57,11 +57,11 @@ public class Game {
 				return;
 			if (inpSide == 1) {
 				players[0] = new HumanPlayer(playerSide);
-				players[1] = new AIKiller(-playerSide, 2);
+				players[1] = new AIKiller(-playerSide, 3);
 			}
 			if (inpSide == 2) {
 				playerSide = -PLAYER1;
-				players[0] = new AIKiller(-playerSide, 2);
+				players[0] = new AIKiller(-playerSide, 3);
 				players[1] = new HumanPlayer(playerSide);
 			}
 		} catch (InputMismatchException e) {
@@ -77,7 +77,7 @@ public class Game {
 	
 	private void aiVsAi() {
 		players = new Player[2];
-		players[0] = new AIKiller(1, 2);
+		players[0] = new AIKiller(1, 1);
 		players[1] = new AIKiller(-1, 3);
 		board.print();
 		while (!gameEnded()) {

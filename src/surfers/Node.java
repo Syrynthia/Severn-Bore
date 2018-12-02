@@ -7,7 +7,6 @@ import lombok.Data;
 public class Node {
 	private int[] surferPostitions;
 	private long positions;
-	private int cutoffs;
 
 	public Node(int[] surferPositions, long positions) {
 		this.surferPostitions = surferPositions;
