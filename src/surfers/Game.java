@@ -77,8 +77,8 @@ public class Game {
 	
 	private void aiVsAi() {
 		players = new Player[2];
-		players[0] = new AIKiller(1, 1);
-		players[1] = new AIKiller(-1, 3);
+		players[0] = new AIKiller(1, 3);
+		players[1] = new AiHistory(-1, 2);
 		board.print();
 		while (!gameEnded()) {
 			int ind = board.getCurrentPlayer() >= 0 ? 0 : 1;

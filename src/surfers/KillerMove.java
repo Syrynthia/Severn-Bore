@@ -1,10 +1,11 @@
 package surfers;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 //I'm using lombok to generate my getters and setters for this class
-//the @Data generates those getters and setters
-@Data
+@Getter
+@Setter
 public class KillerMove {
 	private int cutoffs;
 	private int[] surfers;
@@ -14,5 +15,20 @@ public class KillerMove {
 		this.cutoffs = cutoffs;
 		this.board = board;
 		this.surfers = surfers;
+	}
+
+	// overriding the equals() method for the contains() method I'm using
+	// in the history heuristic
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof KillerMove))
+			return false;
+		KillerMove o = (KillerMove) obj;
+		if (o.getBoard() != board)
+			return false;
+		for (int i = 0; i < surfers.length; i++)
+			if (surfers[i] != o.getSurfers()[i])
+				return false;
+		return true;
 	}
 }
