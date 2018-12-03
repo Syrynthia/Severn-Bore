@@ -21,6 +21,7 @@ public class Game {
 		System.out.println("1 - human vs human");
 		System.out.println("2 - human vs ai");
 		System.out.println("3 - ai vs ai");
+		System.out.println("4 - test");
 		System.out.println("Press any other key to quit the game");
 		int input = -1;
 		try {
@@ -35,6 +36,9 @@ public class Game {
 			break;
 		case 3:
 			aiVsAi();
+			break;
+		case 4:
+			test();
 			break;
 		default:
 			System.out.println("Thanks for playing!");
@@ -78,13 +82,53 @@ public class Game {
 	private void aiVsAi() {
 		players = new Player[2];
 		players[0] = new AIKiller(1, 3);
-		players[1] = new AiHistory(-1, 2);
+		players[1] = new AiAB(-1, 3);
 		board.print();
 		while (!gameEnded()) {
 			int ind = board.getCurrentPlayer() >= 0 ? 0 : 1;
 			players[ind].makeMove(board);
 			board.print();
 		}
+	}
+	
+	private void test() {
+		System.out.println("Input the height to which you want the ai searching");
+		int ht = 0;
+		try {
+			ht = scan.nextInt();
+		} catch (InputMismatchException e) {
+			return;
+		}
+		board.print();
+		players = new Player[4];
+		players[0] = new HumanPlayer(1);
+		players[1] = new AiAB(-1, ht);
+		players[2] = new AIKiller(-1, ht);
+		players[3] = new AiHistory(-1, 1);
+		while (!gameEnded()) {
+			if(board.getCurrentPlayer() >= 0 ) {
+				players[0].makeMove(board);
+				board.print();
+			}
+			else {
+				Board[] b = new Board[3];
+				for(int i = 1; i < players.length; i++) {
+					b[i-1] = new Board(board.getSurfers().clone(), board.getPositions(), board.getCurrentPlayer());
+					players[i].makeMove(b[i-1]);
+					b[i-1].print();
+				}
+				System.out.println("Choose the move you like 0, 1 or 2");
+				int index = 0;
+				try {
+					index = scan.nextInt();
+				} catch (InputMismatchException e) {
+					
+				}
+				board = index >= 0 && index < 3 ? b[index] : b[0];
+			}
+		}
+		
+		
 	}
 
 	private boolean gameEnded() {

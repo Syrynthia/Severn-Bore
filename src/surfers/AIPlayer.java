@@ -182,6 +182,19 @@ public class AIPlayer implements Player {
 				}
 			}
 		}
+		
+		//checking for corners
+		for (int k = 0; k < surfers.length; k++) {
+			if(surfers[k] == 0 || surfers[k] == row  || surfers[k] == row*(col-1)  || surfers[k] == (row*col - 1) ) {
+				if((side >= 0 && k < surfers.length/2) || (side < 0 && k >= surfers.length/2)) {
+					result -= 4*penalty;
+				}
+				// heavily rewarding putting the opponent in a corner
+				else if((side >= 0 && k >= surfers.length/2) || (side < 0 && k < surfers.length/2)) {
+					result += 4*reward;
+				}
+			}
+		}
 
 		return result; // side * (counters[2] + counters[3] - counters[0] - counters[1]);
 	}

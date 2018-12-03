@@ -8,6 +8,7 @@ public class AiHistory extends AIPlayer {
 	private int ht;
 	private List<KillerMove> p1;
 	private List<KillerMove> p2;
+	private int evaluations = 0;
 
 	public AiHistory(int side, int ht) {
 		super(side);
@@ -36,16 +37,22 @@ public class AiHistory extends AIPlayer {
 				}
 			}
 		}
+		System.out.println("History evaluations: " + evaluations);
+		evaluations = 0;
 		board.putAi(sIndex, sPosition, positions);
 	}
 
 	public int histAlphaBeta(Node node, int side, int height, int achievable, int hope) {
-		if (height == 0)
+		if (height == 0) {
+			evaluations ++;
 			return evaluate(node.getPositions(), node.getSurferPostitions(), side);
+		}
 		long[][] moves = getPossibleMoves(node.getPositions(), node.getSurferPostitions(), side);
 		int size = possibleMoveCount(moves);
-		if (size == 0)
+		if (size == 0){
+			evaluations ++;
 			return evaluate(node.getPositions(), node.getSurferPostitions(), side);
+		}
 		List<KillerMove> mv = movesToList(moves, node, side);
 		int temp = 0;
 		for (int i = 0; i < mv.size(); i++) {
@@ -113,7 +120,7 @@ public class AiHistory extends AIPlayer {
 			@Override
 			public int compare(KillerMove arg0, KillerMove arg1) {
 				// sorting in descending order depending on the number of cutoffs
-				return arg0.getCutoffs() - arg1.getCutoffs();
+				return arg1.getCutoffs() - arg0.getCutoffs();
 			}
 		});
 		return list;

@@ -20,6 +20,12 @@ public class Board {
 		putSurfer(2, 19);
 		putSurfer(3, 23);
 	}
+	
+	public Board(int[] surfers, long positions, int currentPlayer) {
+		this.surfers = surfers;
+		this.positions = positions;
+		this.currentPlayer = currentPlayer;
+	}
 
 	private void putSurfer(int surferIndex, int position) {
 		surfers[surferIndex] = position;

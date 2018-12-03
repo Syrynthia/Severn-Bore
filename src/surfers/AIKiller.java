@@ -4,6 +4,7 @@ public class AIKiller extends AIPlayer {
 	private int ht;
 	private KillerMove[] killers;
 	private int currentMove;
+	private int evaluations = 0;
 
 	public AIKiller(int side, int ht) {
 		super(side);
@@ -34,16 +35,22 @@ public class AIKiller extends AIPlayer {
 			}
 		}
 		currentMove += 2;
+		System.out.println("Killer evaluations: "+evaluations);
+		evaluations = 0;
 		board.putAi(sIndex, sPosition, positions);
 	}
 
 	public int killerAlphaBeta(Node node, int side, int height, int achievable, int hope, int ply) {
-		if (height == 0)
+		if (height == 0) {
+			evaluations++;
 			return evaluate(node.getPositions(), node.getSurferPostitions(), side);
+		}
 		long[][] moves = getPossibleMoves(node.getPositions(), node.getSurferPostitions(), side);
 		int size = possibleMoveCount(moves);
-		if (size == 0)
+		if (size == 0){
+			evaluations++;
 			return evaluate(node.getPositions(), node.getSurferPostitions(), side);
+		}
 
 		int i1 = 0;
 		int i2 = 1;
