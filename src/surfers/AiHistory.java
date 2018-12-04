@@ -10,12 +10,20 @@ public class AiHistory extends AIPlayer {
 	private int evaluations = 0;
 	private List<List<HistoryStruct>> pl1;
 	private List<List<HistoryStruct>> pl2;
+	private List<List<KillerMove>> buckets;
 
 	public AiHistory(int side, int ht) {
 		super(side);
 		this.ht = ht;
 		pl1 = new ArrayList<>();
 		pl2 = new ArrayList<>();
+		for (int i = 0; i < 2 * row * col; i++) {
+			pl1.add(new ArrayList<>());
+			pl2.add(new ArrayList<>());
+		}
+		buckets = new ArrayList<>();
+		for (int i = 0; i < 2 * 8 * 8 * Board.MAX_MOVE * Board.MAX_MOVE; i++)
+			buckets.add(new ArrayList<>());
 	}
 
 	@Override
@@ -84,7 +92,6 @@ public class AiHistory extends AIPlayer {
 	private List<KillerMove> movesToList(long[][] moves, Node node, int side) {
 		List<KillerMove> list = new ArrayList<>();
 		List<List<HistoryStruct>> checking = pl1;
-		List<List<KillerMove>> buckets = new ArrayList<>();
 		int i1 = 0;
 		int i2 = 1;
 		if (side < 0) {
@@ -94,10 +101,6 @@ public class AiHistory extends AIPlayer {
 		}
 		for (int i = 0; i < moves.length; i++) {
 			if (moves[i] != null) {
-				if (checking.size() < i + 1) {
-					for (int x = checking.size(); x < i + 1; x++)
-						checking.add(new ArrayList<>());
-				}
 				List<HistoryStruct> l = checking.get(i);
 				int[] sPos = node.getSurferPostitions().clone();
 				if (i < row * col)
@@ -108,10 +111,6 @@ public class AiHistory extends AIPlayer {
 					boolean flag = false;
 					for (HistoryStruct h : l) {
 						if (h.getPositions() == moves[i][j]) {
-							if (buckets.size() < h.getCutoffs() + 1) {
-								for (int x = buckets.size(); x < h.getCutoffs() + 1; x++)
-									buckets.add(new ArrayList<>());
-							}
 							buckets.get(h.getCutoffs()).add(new KillerMove(h.getCutoffs(), sPos, h.getPositions(), i));
 							flag = true;
 							break;
@@ -120,8 +119,6 @@ public class AiHistory extends AIPlayer {
 					}
 					if (!flag) {
 						checking.get(i).add(new HistoryStruct(moves[i][j], 0));
-						if (buckets.size() == 0)
-							buckets.add(new ArrayList<>());
 						buckets.get(0).add(new KillerMove(0, sPos, moves[i][j], i));
 					}
 				}
@@ -129,8 +126,11 @@ public class AiHistory extends AIPlayer {
 		}
 		for (int i = buckets.size() - 1; i >= 0; i--) {
 			if (buckets.get(i) != null) {
-				for (KillerMove k : buckets.get(i))
-					list.add(k);
+				int j = buckets.get(i).size() - 1;
+				while (!buckets.get(i).isEmpty()) {
+					list.add(buckets.get(i).remove(j));
+					j = buckets.get(i).size() - 1;
+				}
 			}
 		}
 		return list;

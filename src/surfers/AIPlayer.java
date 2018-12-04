@@ -196,7 +196,7 @@ public class AIPlayer implements Player {
 			}
 		}
 
-		return result; // side * (counters[2] + counters[3] - counters[0] - counters[1]);
+		return result;
 	}
 
 	public void makeMove(Board board) {
