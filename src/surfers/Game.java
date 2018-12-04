@@ -7,7 +7,6 @@ public class Game {
 	private Board board;
 
 	private Scanner scan = new Scanner(System.in);
-	private AIPlayer aiPlayer;
 	final public static int PLAYER1 = 1;
 	private Player[] players;
 
@@ -104,7 +103,7 @@ public class Game {
 		players[0] = new HumanPlayer(1);
 		players[1] = new AiAB(-1, ht);
 		players[2] = new AIKiller(-1, ht);
-		players[3] = new AiHistory(-1, 1);
+		players[3] = new AiHistory(-1, ht);
 		while (!gameEnded()) {
 			if(board.getCurrentPlayer() >= 0 ) {
 				players[0].makeMove(board);

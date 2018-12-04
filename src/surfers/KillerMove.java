@@ -10,11 +10,19 @@ public class KillerMove {
 	private int cutoffs;
 	private int[] surfers;
 	private long board;
+	private int changedIndex = 0;
 
 	public KillerMove(int cutoffs, int[] surfers, long board) {
 		this.cutoffs = cutoffs;
 		this.board = board;
 		this.surfers = surfers;
+	}	
+	
+	public KillerMove(int cutoffs, int[] surfers, long board, int changedIndex) {
+		this.cutoffs = cutoffs;
+		this.board = board;
+		this.surfers = surfers;
+		this.changedIndex = changedIndex;
 	}
 
 	// overriding the equals() method for the contains() method I'm using

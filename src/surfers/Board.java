@@ -5,6 +5,7 @@ import java.util.Arrays;
 public class Board {
 	final static public int ROW = 5;
 	final static public int COL = 5;
+	final static public int MAX_MOVE = 3;
 	final private int NUM_SURFERS = 4;
 	private long positions = 0;
 	int[] surfers;
@@ -113,8 +114,8 @@ public class Board {
 		int xDif = Math.abs(x1 - x2);
 		int yDif = Math.abs(y1 - y2);
 		// checking if the move is up to 5 paces from the original position
-		if (xDif > 5 || yDif > 5) {
-			System.out.println("Move up to 5 paces");
+		if (xDif > MAX_MOVE || yDif > MAX_MOVE) {
+			System.out.println("Move up to "+MAX_MOVE+" paces");
 			return false;
 		}
 		int xyDif = Math.abs(xDif - yDif);

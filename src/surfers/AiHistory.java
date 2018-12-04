@@ -1,22 +1,23 @@
 package surfers;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 public class AiHistory extends AIPlayer {
 	private int ht;
-	private List<KillerMove> p1;
-	private List<KillerMove> p2;
 	private int evaluations = 0;
+	private List<List<HistoryStruct>> pl1;
+	private List<List<HistoryStruct>> pl2;
 
 	public AiHistory(int side, int ht) {
 		super(side);
 		this.ht = ht;
-		p1 = new ArrayList<>();
-		p2 = new ArrayList<>();
+		pl1 = new ArrayList<>();
+		pl2 = new ArrayList<>();
 	}
-	
+
 	@Override
 	public void makeMove(Board board) {
 		long[][] moves = getPossibleMoves(board.getPositions(), board.getSurfers(), getSide());
@@ -27,7 +28,8 @@ public class AiHistory extends AIPlayer {
 		for (int i = 0; i < moves.length; i++) {
 			if (moves[i] != null) {
 				for (int j = 0; j < moves[i].length; j++) {
-					int eval = histAlphaBeta(new Node(board.getSurfers().clone(), moves[i][j]), getSide(), ht, -10000, 10000);
+					int eval = histAlphaBeta(new Node(board.getSurfers().clone(), moves[i][j]), getSide(), ht, -10000,
+							10000);
 					if (eval > topEval) {
 						topEval = eval;
 						sIndex = i < row * col ? index1 : index2;
@@ -44,34 +46,32 @@ public class AiHistory extends AIPlayer {
 
 	public int histAlphaBeta(Node node, int side, int height, int achievable, int hope) {
 		if (height == 0) {
-			evaluations ++;
+			evaluations++;
 			return evaluate(node.getPositions(), node.getSurferPostitions(), side);
 		}
 		long[][] moves = getPossibleMoves(node.getPositions(), node.getSurferPostitions(), side);
 		int size = possibleMoveCount(moves);
-		if (size == 0){
-			evaluations ++;
+		if (size == 0) {
+			evaluations++;
 			return evaluate(node.getPositions(), node.getSurferPostitions(), side);
 		}
 		List<KillerMove> mv = movesToList(moves, node, side);
 		int temp = 0;
+		int counter = 0;
 		for (int i = 0; i < mv.size(); i++) {
+			counter++;
 			temp = -histAlphaBeta(new Node(mv.get(i).getSurfers(), mv.get(i).getBoard()), -side, height - 1, -hope,
 					-achievable);
 			if (temp >= hope) {
-				if (side < 0) {
-					if (p2.contains(mv.get(i)))
-						p2.get(p2.indexOf(mv.get(i))).setCutoffs(size - i + 1);
-					else {
-						mv.get(i).setCutoffs(size - i + 1);
-						p2.add(mv.get(i));
+				if (side >= 0) {
+					for (HistoryStruct h : pl1.get(mv.get(i).getChangedIndex())) {
+						if (h.getPositions() == mv.get(i).getBoard())
+							h.setCutoffs(size - counter);
 					}
 				} else {
-					if (p1.contains(mv.get(i)))
-						p1.get(p1.indexOf(mv.get(i))).setCutoffs(size - i + 1);
-					else {
-						mv.get(i).setCutoffs(size - i + 1);
-						p1.add(mv.get(i));
+					for (HistoryStruct h : pl2.get(mv.get(i).getChangedIndex())) {
+						if (h.getPositions() == mv.get(i).getBoard())
+							h.setCutoffs(size - counter);
 					}
 				}
 				return temp;
@@ -83,46 +83,56 @@ public class AiHistory extends AIPlayer {
 
 	private List<KillerMove> movesToList(long[][] moves, Node node, int side) {
 		List<KillerMove> list = new ArrayList<>();
+		List<List<HistoryStruct>> checking = pl1;
+		List<List<KillerMove>> buckets = new ArrayList<>();
 		int i1 = 0;
 		int i2 = 1;
 		if (side < 0) {
 			i1 = 2;
 			i2 = 3;
+			checking = pl2;
 		}
 		for (int i = 0; i < moves.length; i++) {
 			if (moves[i] != null) {
+				if (checking.size() < i + 1) {
+					for (int x = checking.size(); x < i + 1; x++)
+						checking.add(new ArrayList<>());
+				}
+				List<HistoryStruct> l = checking.get(i);
 				int[] sPos = node.getSurferPostitions().clone();
 				if (i < row * col)
 					sPos[i1] = i;
 				else
 					sPos[i2] = i % (row * col);
 				for (int j = 0; j < moves[i].length; j++) {
-					KillerMove k = new KillerMove(0, sPos, moves[i][j]);
-					if (side < 0) {
-						if (p2.contains(k))
-							list.add(p2.get(p2.indexOf(k)));
-						else {
-							p2.add(k);
-							list.add(k);
+					boolean flag = false;
+					for (HistoryStruct h : l) {
+						if (h.getPositions() == moves[i][j]) {
+							if (buckets.size() < h.getCutoffs() + 1) {
+								for (int x = buckets.size(); x < h.getCutoffs() + 1; x++)
+									buckets.add(new ArrayList<>());
+							}
+							buckets.get(h.getCutoffs()).add(new KillerMove(h.getCutoffs(), sPos, h.getPositions(), i));
+							flag = true;
+							break;
 						}
-					} else {
-						if (p1.contains(k))
-							list.add(p1.get(p1.indexOf(k)));
-						else {
-							p1.add(k);
-							list.add(k);
-						}
+
+					}
+					if (!flag) {
+						checking.get(i).add(new HistoryStruct(moves[i][j], 0));
+						if (buckets.size() == 0)
+							buckets.add(new ArrayList<>());
+						buckets.get(0).add(new KillerMove(0, sPos, moves[i][j], i));
 					}
 				}
 			}
 		}
-		list.sort(new Comparator<KillerMove>() {
-			@Override
-			public int compare(KillerMove arg0, KillerMove arg1) {
-				// sorting in descending order depending on the number of cutoffs
-				return arg1.getCutoffs() - arg0.getCutoffs();
+		for (int i = buckets.size() - 1; i >= 0; i--) {
+			if (buckets.get(i) != null) {
+				for (KillerMove k : buckets.get(i))
+					list.add(k);
 			}
-		});
+		}
 		return list;
 	}
 }
