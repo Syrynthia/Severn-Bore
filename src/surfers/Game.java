@@ -1,3 +1,4 @@
+// Alicja Przybys, nr 18204233
 package surfers;
 
 import java.util.InputMismatchException;
@@ -14,13 +15,13 @@ public class Game {
 		this.board = board;
 	}
 
+	// game intialising method
 	public void init() {
 		System.out.println("Hello! Glad you're up for a game of Severn Bore! " + "Which mode would you like to play?");
 		System.out.println("Please select: ");
-		System.out.println("1 - human vs human");
-		System.out.println("2 - human vs ai");
-		System.out.println("3 - ai vs ai");
-		System.out.println("4 - test");
+		System.out.println("1 - human vs ai");
+		System.out.println("2 - ai vs ai");
+		System.out.println("3 - test");
 		System.out.println("Press any other key to quit the game");
 		int input = -1;
 		try {
@@ -30,13 +31,13 @@ public class Game {
 			return;
 		}
 		switch (input) {
-		case 2:
+		case 1:
 			humanVsAi();
 			break;
-		case 3:
+		case 2:
 			aiVsAi();
 			break;
-		case 4:
+		case 3:
 			test();
 			break;
 		default:
@@ -45,6 +46,7 @@ public class Game {
 		}
 	}
 
+	// function for playing a single ai
 	private void humanVsAi() {
 		System.out.println("Which side would you like to play?");
 		System.out.println("Please select: ");
@@ -53,6 +55,9 @@ public class Game {
 		System.out.println("Press any other key to quit the game");
 		players = new Player[2];
 		String input = scan.next();
+		int ht = getAiHeight();
+		if (ht < 0)
+			return;
 		int playerSide = PLAYER1;
 		try {
 			int inpSide = Integer.parseInt(input);
@@ -60,14 +65,14 @@ public class Game {
 				return;
 			if (inpSide == 1) {
 				players[0] = new HumanPlayer(playerSide);
-				players[1] = new AIKiller(-playerSide, 3);
+				players[1] = new AIKiller(-playerSide, ht);
 			}
 			if (inpSide == 2) {
 				playerSide = -PLAYER1;
-				players[0] = new AIKiller(-playerSide, 3);
+				players[0] = new AIKiller(-playerSide, ht);
 				players[1] = new HumanPlayer(playerSide);
 			}
-		} catch (InputMismatchException e) {
+		} catch (NumberFormatException e) {
 			return;
 		}
 		board.print();
@@ -78,10 +83,14 @@ public class Game {
 		}
 	}
 	
+	// just a bit of fun with watching the ai fight each other
 	private void aiVsAi() {
+		int ht = getAiHeight();
+		if (ht < 0)
+			return;
 		players = new Player[2];
-		players[0] = new AIKiller(1, 3);
-		players[1] = new AiAB(-1, 3);
+		players[0] = new AIKiller(1, ht);
+		players[1] = new AiAB(-1, ht);
 		board.print();
 		while (!gameEnded()) {
 			int ind = board.getCurrentPlayer() >= 0 ? 0 : 1;
@@ -90,14 +99,11 @@ public class Game {
 		}
 	}
 	
+	// specific function for testing all three ai on every single move
 	private void test() {
-		System.out.println("Input the height to which you want the ai searching");
-		int ht = 0;
-		try {
-			ht = scan.nextInt();
-		} catch (InputMismatchException e) {
+		int ht = getAiHeight();
+		if (ht < 0)
 			return;
-		}
 		board.print();
 		players = new Player[4];
 		players[0] = new HumanPlayer(1);
@@ -130,6 +136,9 @@ public class Game {
 		
 	}
 
+	// function checking for when either of the players has no way to go 
+	// function assumes player 1 (side 1) has the first two surfers and player 2 has the other two
+	// returns true if either of the player's surfers are completely surrounded
 	private boolean gameEnded() {
 		long[] masks = new long[4];
 		int[] surfers = board.getSurfers();
@@ -159,7 +168,22 @@ public class Game {
 		}
 		return false;
 	}
+	
+	// function for getting the input for the height to which the algorithms are supposed to search
+	// isolated because it's used in several places
+	// height corresponds to ply-1 ie we can set ht to 0 and it will just evaluate possible moves
+	private int getAiHeight() {
+		System.out.println("Input the height to which you want the ai searching");
+		int ht = 0;
+		try {
+			ht = scan.nextInt();
+		} catch (InputMismatchException e) {
+			return -1;
+		}
+		return ht;
+	}
 
+	// the run of the game itself
 	public static void main(String[] args) {
 		Board board = new Board();
 		Game game = new Game(board);

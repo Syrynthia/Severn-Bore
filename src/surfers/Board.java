@@ -1,6 +1,5 @@
+// Alicja Przybys, nr 18204233
 package surfers;
-
-import java.util.Arrays;
 
 public class Board {
 	final static public int ROW = 5;
@@ -10,44 +9,51 @@ public class Board {
 	private long positions = 0;
 	int[] surfers;
 	private int currentPlayer = Game.PLAYER1;
-	// letters reversed for printing
 	final static public String[] LETTERS = { "A", "B", "C", "D", "E", "F", "G" };
 
 	// default constructor setting up the board for the game
 	public Board() {
 		surfers = new int[NUM_SURFERS];
+		// initial setup, didn't bother parametrising, because it only happens in this one place
 		putSurfer(0, 1);
 		putSurfer(1, 5);
 		putSurfer(2, 19);
 		putSurfer(3, 23);
 	}
 	
+	// constructor for creating other boards with the same parameters - for the testing method
 	public Board(int[] surfers, long positions, int currentPlayer) {
 		this.surfers = surfers;
 		this.positions = positions;
 		this.currentPlayer = currentPlayer;
 	}
 
+	// method for putting down a surfer
 	private void putSurfer(int surferIndex, int position) {
 		surfers[surferIndex] = position;
 		positions = positions | 1L << (position);
 	}
 	
+	// as ai is not going to do illegal moves
+	// it can simply change the board and the surfer array
 	public void putAi(int sIndex, int sPosition, long board) {
 		surfers[sIndex] = sPosition;
 		positions = board;
 		currentPlayer = -currentPlayer;
 	}
 
+	// taking the selected surfer off the board
 	private void removeSurfer(int surferIndex) {
 		positions = positions ^ 1L << (surfers[surferIndex]);
 		surfers[surferIndex] = -1;
 	}
 
+	// self explanatory
 	private void putCharge(int x, int y) {
 		positions = positions | 1L << (x * ROW + y);
 	}
 
+	// function for registering the players move - this one checks if the move is not illegal
 	public boolean movePlayer(int surferIndex, int x, int y, int chargeX, int chargeY) {
 		if (movePossible(surfers[surferIndex], x, y, chargeX, chargeY)) {
 			removeSurfer(surferIndex);
@@ -60,6 +66,7 @@ public class Board {
 		return false;
 	}
 
+	// function for checking the legality of a move
 	public boolean movePossible(int s, int x, int y, int chargeX, int chargeY) {
 		// checking if the move doesn't go off board
 		if (x < 0 || x > 6 || y < 0 || y > 6)
@@ -81,10 +88,12 @@ public class Board {
 		return true;
 	}
 
+	// printing function for the current state of the board
 	public void print() {
 		print(positions, surfers);
 	}
 
+	// generic printing function for testing purposes
 	public void print(long pos, int[] s) {
 
 		System.out.println("   1 2 3 4 5 ");
@@ -110,6 +119,7 @@ public class Board {
 			System.out.println("It's player 2's time to move");
 	}
 
+	// function for checking if the surfer or the charge are not going over any other surfers or charges
 	private boolean canMove(long pos, int x1, int y1, int x2, int y2) {
 		int xDif = Math.abs(x1 - x2);
 		int yDif = Math.abs(y1 - y2);

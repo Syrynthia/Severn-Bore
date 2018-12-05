@@ -1,3 +1,4 @@
+// Alicja Przybys, nr 18204233
 package surfers;
 
 import java.util.Scanner;
@@ -12,6 +13,7 @@ public class HumanPlayer implements Player {
 	final public static String[] LETTERS = Board.LETTERS;
 	final static public String[] letters = { "a", "b", "c", "d", "e", "f", "g" };
 
+	// asks for input, checks if the input is valid, if it's not asks again, if it is makes the move
 	public void makeMove(Board board) {
 		boolean inputting = true;
 		int[] positions = new int[3];
@@ -31,7 +33,8 @@ public class HumanPlayer implements Player {
 			}
 		}
 	}
-
+	
+	// function for reading the "a1 a2 a4" input
 	public int[] inputParser(String input) {
 		String[] spl = input.split(" ");
 		if (spl.length != 3)
@@ -45,7 +48,8 @@ public class HumanPlayer implements Player {
 		}
 		return values;
 	}
-
+	
+	// takes a single "a1" and changes it into an integer value on the board
 	private int letters2numbers(String s) {
 		int val = 0;
 		boolean flag = false;

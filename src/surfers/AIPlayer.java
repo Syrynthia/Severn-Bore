@@ -1,9 +1,12 @@
+// Alicja Przybys, nr 18204233
 package surfers;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+// superclass for the ai algorithms also serving as a random player
+// contains the evaluation function as well as the move generator
 public class AIPlayer implements Player {
 	private int side;
 	protected int row = Board.ROW;
@@ -189,7 +192,6 @@ public class AIPlayer implements Player {
 				if((side >= 0 && k < surfers.length/2) || (side < 0 && k >= surfers.length/2)) {
 					result -= 4*penalty;
 				}
-				// heavily rewarding putting the opponent in a corner
 				else if((side >= 0 && k >= surfers.length/2) || (side < 0 && k < surfers.length/2)) {
 					result += 4*reward;
 				}
@@ -199,6 +201,7 @@ public class AIPlayer implements Player {
 		return result;
 	}
 
+	// makes a random move - this being the superclass for the other ai, I figured I might make it the random player
 	public void makeMove(Board board) {
 		long[][] moves = getPossibleMoves(board.getPositions(), board.getSurfers(), this.side);
 		int size = possibleMoveCount(moves);

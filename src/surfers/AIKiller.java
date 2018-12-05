@@ -1,5 +1,7 @@
+// Alicja Przybys, nr 18204233
 package surfers;
 
+// alphabeta algorithm with the implemented killer heuristic
 public class AIKiller extends AIPlayer {
 	private int ht;
 	private KillerMove[] killers;
@@ -13,6 +15,8 @@ public class AIKiller extends AIPlayer {
 		currentMove = side >= 0 ? 0 : 1;
 	}
 
+	// unlike the pure alphabeta and history, this makeMove also keeps the count of which move we're on
+	// to address the correct killer move for the current ply
 	@Override
 	public void makeMove(Board board) {
 		long[][] moves = getPossibleMoves(board.getPositions(), board.getSurfers(), getSide());
@@ -40,6 +44,7 @@ public class AIKiller extends AIPlayer {
 		board.putAi(sIndex, sPosition, positions);
 	}
 
+	// alphabeta algorithm function
 	public int killerAlphaBeta(Node node, int side, int height, int achievable, int hope, int ply) {
 		if (height == 0) {
 			evaluations++;
@@ -59,6 +64,8 @@ public class AIKiller extends AIPlayer {
 			i2 = 3;
 		}
 		int temp = 0;
+		// checking if the killer move for this ply exists and if it's still available 
+		// then doing the search for it first
 		if(killers[ply] != null) {
 			temp = getKiller(killers[ply], side, height, hope, achievable, ply, moves);
 			if (temp >= hope) {
@@ -67,6 +74,7 @@ public class AIKiller extends AIPlayer {
 			}
 		}
 		int counter = 0;
+		// main algorithm part
 		for (int i = 0; i < moves.length; i++) {
 			if (moves[i] != null) {
 				int[] sPos = node.getSurferPostitions().clone();
@@ -79,6 +87,7 @@ public class AIKiller extends AIPlayer {
 					temp = -killerAlphaBeta(new Node(sPos, moves[i][j]), -side, height - 1, -hope, -achievable,
 							ply + 1);
 					if (temp >= hope) {
+						// recording a killer move additionally to doing the cutoff
 						if (killers[ply] == null)
 							killers[ply] = new KillerMove(size - counter, sPos, moves[i][j]);
 						else if (killers[ply].getCutoffs() < size - counter)
@@ -92,6 +101,8 @@ public class AIKiller extends AIPlayer {
 		return achievable;
 	}
 
+	// separated function for finding the evaluation for the killer move
+	// separated because of the annoying search if the killer move is still available
 	private int getKiller(KillerMove k, int side, int height, int hope, int achievable, int ply, long[][] moves) {
 		for (int i = 0; i < moves.length; i++) {
 			if (moves[i] != null) {
@@ -106,6 +117,7 @@ public class AIKiller extends AIPlayer {
 				}
 			}
 		}
+		// basically -infinity just so it doesn't get picked if it's no longer killer
 		return -100000;
 	}
 

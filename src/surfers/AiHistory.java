@@ -1,15 +1,18 @@
+// Alicja Przybys, nr 18204233
 package surfers;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
+// class implementing the history heuristic
 public class AiHistory extends AIPlayer {
 	private int ht;
 	private int evaluations = 0;
+	// list keeping the moves for player 1
 	private List<List<HistoryStruct>> pl1;
+	// list keeping the moves for player 2
 	private List<List<HistoryStruct>> pl2;
+	// list for bucket sort for move reordering
 	private List<List<KillerMove>> buckets;
 
 	public AiHistory(int side, int ht) {
@@ -63,6 +66,7 @@ public class AiHistory extends AIPlayer {
 			evaluations++;
 			return evaluate(node.getPositions(), node.getSurferPostitions(), side);
 		}
+		// here the moves get reordered
 		List<KillerMove> mv = movesToList(moves, node, side);
 		int temp = 0;
 		int counter = 0;
@@ -72,14 +76,21 @@ public class AiHistory extends AIPlayer {
 					-achievable);
 			if (temp >= hope) {
 				if (side >= 0) {
+					// here the number of cuttoffs is changed for each move
+					// my list reordering also takes care of putting all the moves in the pl1 and pl2 lists
+					// so I don't worry about it over here
 					for (HistoryStruct h : pl1.get(mv.get(i).getChangedIndex())) {
-						if (h.getPositions() == mv.get(i).getBoard())
+						if (h.getPositions() == mv.get(i).getBoard()) {
 							h.setCutoffs(size - counter);
+							break;
+						}
 					}
 				} else {
 					for (HistoryStruct h : pl2.get(mv.get(i).getChangedIndex())) {
-						if (h.getPositions() == mv.get(i).getBoard())
+						if (h.getPositions() == mv.get(i).getBoard()) {
 							h.setCutoffs(size - counter);
+							break;
+						}
 					}
 				}
 				return temp;
@@ -89,6 +100,7 @@ public class AiHistory extends AIPlayer {
 		return achievable;
 	}
 
+	// reorders the moves according to their number of cutoffs and registers new moves
 	private List<KillerMove> movesToList(long[][] moves, Node node, int side) {
 		List<KillerMove> list = new ArrayList<>();
 		List<List<HistoryStruct>> checking = pl1;
@@ -111,12 +123,14 @@ public class AiHistory extends AIPlayer {
 					boolean flag = false;
 					for (HistoryStruct h : l) {
 						if (h.getPositions() == moves[i][j]) {
+							// putting the moves into the buckets ordered by the number of cuttoffs
 							buckets.get(h.getCutoffs()).add(new KillerMove(h.getCutoffs(), sPos, h.getPositions(), i));
 							flag = true;
 							break;
 						}
 
 					}
+					// if the move has not been found, it is put into the list with the initial nr of cutoffs set to 0
 					if (!flag) {
 						checking.get(i).add(new HistoryStruct(moves[i][j], 0));
 						buckets.get(0).add(new KillerMove(0, sPos, moves[i][j], i));
@@ -124,13 +138,11 @@ public class AiHistory extends AIPlayer {
 				}
 			}
 		}
+		// emptying the buckets into the output list
 		for (int i = buckets.size() - 1; i >= 0; i--) {
 			if (buckets.get(i) != null) {
-				int j = buckets.get(i).size() - 1;
-				while (!buckets.get(i).isEmpty()) {
-					list.add(buckets.get(i).remove(j));
-					j = buckets.get(i).size() - 1;
-				}
+				while (!buckets.get(i).isEmpty())
+					list.add(buckets.get(i).remove(0));
 			}
 		}
 		return list;

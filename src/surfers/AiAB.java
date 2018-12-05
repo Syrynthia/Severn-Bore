@@ -1,5 +1,7 @@
+// Alicja Przybys, nr 18204233
 package surfers;
 
+// pure alphabeta implementation
 public class AiAB extends AIPlayer{
 	private int ht;
 	private int evaluations = 0;
